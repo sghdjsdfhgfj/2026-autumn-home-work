@@ -1,4 +1,4 @@
-package company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener;
+package company.vk.edu.distrib.compute.sghdjsdfhgfj;
 
 import java.io.Serial;
 
@@ -30,5 +30,9 @@ public class StatusCodeException extends Exception {
 
     public static StatusCodeException notFound() {
         return new StatusCodeException(404);
+    }
+
+    public static StatusCodeException badRequest() {
+        return new StatusCodeException(400);
     }
 }

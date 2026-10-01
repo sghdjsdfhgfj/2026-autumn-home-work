@@ -1,4 +1,4 @@
-package company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener;
+package company.vk.edu.distrib.compute.sghdjsdfhgfj;
 
 import company.vk.edu.distrib.compute.Dao;
 
@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PersistentDao implements Dao<String> {
-    private final Map<String, String> data;
+public class PersistentDao implements Dao<byte[]> {
+    private final Map<String, byte[]> data;
     private final String filename;
     private final ReentrantLock lock;
 
-    PersistentDao(Path path) throws IOException {
+    public PersistentDao(Path path) throws IOException {
         this.filename = path.toString();
         data = new HashMap<>();
         lock = new ReentrantLock();
@@ -22,7 +22,7 @@ public class PersistentDao implements Dao<String> {
     }
 
     @Override
-    public String get(String key) throws NoSuchElementException, IllegalArgumentException, IOException {
+    public byte[] get(String key) throws NoSuchElementException, IllegalArgumentException, IOException {
         if (!data.containsKey(key)) {
             throw new NoSuchElementException();
         }
@@ -34,7 +34,7 @@ public class PersistentDao implements Dao<String> {
     }
 
     @Override
-    public void upsert(String key, String value) throws IllegalArgumentException, IOException {
+    public void upsert(String key, byte[] value) throws IllegalArgumentException, IOException {
         try {
             lock.lock();
             data.put(key, value);
@@ -49,7 +49,7 @@ public class PersistentDao implements Dao<String> {
         try {
             lock.lock();
             data.remove(key);
-            append(key, "");
+            append(key, new byte[0]);
         } finally {
             lock.unlock();
         }
@@ -65,10 +65,12 @@ public class PersistentDao implements Dao<String> {
             while (true) {
                 try {
                     String key = file.readUTF();
-                    String value = file.readUTF();
-                    if (value.isEmpty()) {
+                    int valueLength = file.readInt();
+                    if (valueLength == 0) {
                         data.remove(key);
                     } else {
+                        byte[] value = new byte[valueLength];
+                        file.readFully(value);
                         data.put(key, value);
                     }
                 } catch (EOFException e) {
@@ -78,11 +80,12 @@ public class PersistentDao implements Dao<String> {
         }
     }
 
-    private void append(String key, String value) throws IOException {
+    private void append(String key, byte[] value) throws IOException {
         try (RandomAccessFile file = new RandomAccessFile(filename, "rw")) {
             file.seek(file.length());
             file.writeUTF(key);
-            file.writeUTF(value);
+            file.writeInt(value.length);
+            file.write(value);
         }
     }
 }
