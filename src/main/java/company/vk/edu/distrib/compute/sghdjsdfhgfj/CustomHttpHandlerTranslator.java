@@ -1,8 +1,7 @@
-package company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.handlers;
+package company.vk.edu.distrib.compute.sghdjsdfhgfj;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.StatusCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
