@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class CustomHttpHandlerTranslator implements HttpHandler {
     private final CustomHttpHandler handler;
-    private static final Logger LOG = LoggerFactory.getLogger(CustomHttpHandlerTranslator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomHttpHandlerTranslator.class);
 
     public CustomHttpHandlerTranslator(CustomHttpHandler handler) {
         this.handler = handler;
@@ -27,10 +27,13 @@ public class CustomHttpHandlerTranslator implements HttpHandler {
                 default -> httpExchange.sendResponseHeaders(404, 0);
             }
         } catch (StatusCodeException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("{} {} - returned {}", httpExchange.getRequestMethod(), httpExchange.getRequestURI(), e.getStatusCode());
+            }
             httpExchange.sendResponseHeaders(e.getStatusCode(), 0);
         } catch (Exception e) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error(e.getMessage(), e);
+            if (logger.isErrorEnabled()) {
+                logger.error(e.getMessage(), e);
             }
             httpExchange.sendResponseHeaders(500, 0);
             httpExchange.getResponseBody().write(e.toString().getBytes());
