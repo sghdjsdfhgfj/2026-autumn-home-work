@@ -5,7 +5,6 @@ import company.vk.edu.distrib.compute.kv.RemoteDaoFactory;
 import company.vk.edu.distrib.compute.kv.RemoteDaoFactoryTest;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 @RemoteDaoFactoryTest
 public class MyRemoteDaoFactory implements RemoteDaoFactory<String> {
@@ -13,10 +12,6 @@ public class MyRemoteDaoFactory implements RemoteDaoFactory<String> {
     public Dao<String> create(int... ports) throws IOException {
         int port = ports[0];
         new MyKVServiceFactory().create(port).start();
-        try {
-            return new MyRemoteDao(port);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return new MyRemoteDao(port);
     }
 }

@@ -22,6 +22,7 @@ public class MyUrlShortenerService implements UrlShortenerService {
     private final HttpServer server;
     private Dao<String> urls;
     private final Dao<String> users;
+    private static final int TWO = 2;
 
     public MyUrlShortenerService(int port) throws IOException {
         InetSocketAddress addr = new InetSocketAddress(port);
@@ -65,7 +66,7 @@ public class MyUrlShortenerService implements UrlShortenerService {
         Base64.Decoder decoder = Base64.getDecoder();
         String auth = new String(decoder.decode(header.substring(6)), StandardCharsets.UTF_8);
         String[] credentials = auth.split(":");
-        if (credentials.length != 2) {
+        if (credentials.length != TWO) {
             return false;
         }
         try {
