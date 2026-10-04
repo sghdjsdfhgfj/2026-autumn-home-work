@@ -15,13 +15,12 @@ import java.nio.file.Path;
 
 public class MyKVService implements KVService {
     private final HttpServer server;
-    private final PersistentDao storage;
 
     public MyKVService(int port) throws IOException {
         InetSocketAddress addr = new InetSocketAddress(port);
         server = HttpServer.create(addr, 0);
         Path tempDir = Files.createTempDirectory("sghdjsdfhgfj");
-        storage = new PersistentDao(tempDir.resolve(RequestUtils.generateId()));
+        PersistentDao storage = new PersistentDao(tempDir.resolve(RequestUtils.generateId()));
 
         addContext("/v0/status", new StatusHandler());
         addContext("/v0/entity", new StorageHandler(storage));

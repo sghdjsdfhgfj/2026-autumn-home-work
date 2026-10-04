@@ -6,11 +6,9 @@ import company.vk.edu.distrib.compute.sghdjsdfhgfj.PersistentDao;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.StatusCodeException;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 class StorageHandler implements CustomHttpHandler {
-    private PersistentDao storage;
+    private final PersistentDao storage;
     private static final int PATH_DEPTH = 3;
 
     public StorageHandler(PersistentDao storage) {
@@ -20,11 +18,11 @@ class StorageHandler implements CustomHttpHandler {
     @Override
     public void handleGet(HttpExchange xch) throws IOException, StatusCodeException {
         String id = getId(xch);
-        try {
+        if (storage.containsKey(id)) {
             byte[] value = storage.get(id);
             xch.sendResponseHeaders(200, 0);
             xch.getResponseBody().write(value);
-        } catch (NoSuchElementException e) {
+        } else {
             throw StatusCodeException.notFound();
         }
     }
@@ -46,7 +44,6 @@ class StorageHandler implements CustomHttpHandler {
 
     private String getId(HttpExchange xch) throws StatusCodeException {
         String[] separatedPath = xch.getRequestURI().getPath().split("/");
-        System.out.println(Arrays.toString(separatedPath));
         if (separatedPath.length <= PATH_DEPTH) {
             throw StatusCodeException.badRequest();
         }

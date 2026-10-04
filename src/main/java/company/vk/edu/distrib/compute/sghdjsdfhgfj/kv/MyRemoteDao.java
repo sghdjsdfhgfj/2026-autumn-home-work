@@ -1,18 +1,18 @@
 package company.vk.edu.distrib.compute.sghdjsdfhgfj.kv;
 
 import company.vk.edu.distrib.compute.Dao;
+import company.vk.edu.distrib.compute.StatusCode;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.NoSuchElementException;
 
 public class MyRemoteDao implements Dao<String> {
     private final URI url;
 
-    public MyRemoteDao(int port) throws URISyntaxException {
-        url = new URI("http://localhost:" + port);
+    public MyRemoteDao(int port) {
+        url = URI.create("http://localhost:" + port);
     }
 
     @Override
@@ -21,10 +21,10 @@ public class MyRemoteDao implements Dao<String> {
         conn.setRequestMethod("GET");
         conn.setDoOutput(true);
         int status = conn.getResponseCode();
-        if (status == 200) {
+        if (status == StatusCode.OK.getCode()) {
             byte[] contents = conn.getInputStream().readAllBytes();
             return new String(contents);
-        } else if (status == 404) {
+        } else if (status == StatusCode.NOT_FOUND.getCode()) {
             throw new NoSuchElementException();
         } else {
             throw new IOException(conn.getResponseMessage());
@@ -40,7 +40,7 @@ public class MyRemoteDao implements Dao<String> {
         conn.getOutputStream().flush();
         conn.getOutputStream().close();
         int status = conn.getResponseCode();
-        if (status != 201) {
+        if (status != StatusCode.CREATED.getCode()) {
             throw new IOException(conn.getResponseMessage());
         }
     }
@@ -50,13 +50,13 @@ public class MyRemoteDao implements Dao<String> {
         HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity/" + key).toURL().openConnection();
         conn.setRequestMethod("DELETE");
         int status = conn.getResponseCode();
-        if (status != 202) {
+        if (status != StatusCode.ACCEPTED.getCode()) {
             throw new IOException(conn.getResponseMessage());
         }
     }
 
     @Override
     public void close() throws IOException {
-
+        //
     }
 }

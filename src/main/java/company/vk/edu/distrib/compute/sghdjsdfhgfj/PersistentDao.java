@@ -4,6 +4,7 @@ import company.vk.edu.distrib.compute.Dao;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -13,6 +14,7 @@ public class PersistentDao implements Dao<byte[]> {
     private final Map<String, byte[]> data;
     private final String filename;
     private final ReentrantLock lock;
+    private static final int MAX_LENGTH = 2048;
 
     public PersistentDao(Path path) throws IOException {
         this.filename = path.toString();
@@ -35,6 +37,9 @@ public class PersistentDao implements Dao<byte[]> {
 
     @Override
     public void upsert(String key, byte[] value) throws IllegalArgumentException, IOException {
+        if (value.length > MAX_LENGTH) {
+            throw new IllegalArgumentException("value is too long");
+        }
         try {
             lock.lock();
             data.put(key, value);
@@ -62,6 +67,7 @@ public class PersistentDao implements Dao<byte[]> {
 
     private void read() throws IOException {
         try (RandomAccessFile file = new RandomAccessFile(filename, "rw")) {
+            byte[] value = new byte[MAX_LENGTH];
             while (true) {
                 try {
                     String key = file.readUTF();
@@ -69,9 +75,8 @@ public class PersistentDao implements Dao<byte[]> {
                     if (valueLength == 0) {
                         data.remove(key);
                     } else {
-                        byte[] value = new byte[valueLength];
-                        file.readFully(value);
-                        data.put(key, value);
+                        file.read(value, 0, valueLength);
+                        data.put(key, Arrays.copyOfRange(value, 0, valueLength));
                     }
                 } catch (EOFException e) {
                     break;
