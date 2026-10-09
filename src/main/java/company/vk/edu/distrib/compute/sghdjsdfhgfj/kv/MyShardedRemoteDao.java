@@ -17,10 +17,10 @@ public class MyShardedRemoteDao implements Dao<String> {
         shards = new Shard[shardCount];
 
         Random random = new Random(6769);
-        List<Shard> shards_ = Arrays.stream(ports).mapToObj(port ->
+        List<Shard> shardList = Arrays.stream(ports).mapToObj(port ->
                 new Shard(new MyRemoteDao(port), random.nextLong())
         ).toList();
-        shards_.toArray(shards);
+        shardList.toArray(shards);
 
         Arrays.sort(shards, Comparator.comparingLong(Shard::hash));
     }
