@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.*;
 
 public class MyShardedRemoteDao implements Dao<String> {
     private final int shardCount;
@@ -17,12 +14,14 @@ public class MyShardedRemoteDao implements Dao<String> {
 
     public MyShardedRemoteDao(int... ports) {
         shardCount = ports.length;
-        shards = new Shard[ports.length];
+        shards = new Shard[shardCount];
 
         Random random = new Random(6769);
-        for (int i = 0; i < shardCount; i++) {
-            shards[i] = new Shard(new MyRemoteDao(ports[i]), random.nextLong());
-        }
+        List<Shard> shards_ = Arrays.stream(ports).mapToObj(port ->
+                new Shard(new MyRemoteDao(port), random.nextLong())
+        ).toList();
+        shards_.toArray(shards);
+
         Arrays.sort(shards, Comparator.comparingLong(Shard::hash));
     }
 
