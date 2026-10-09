@@ -7,6 +7,8 @@ import company.vk.edu.distrib.compute.sghdjsdfhgfj.CustomHttpHandler;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.CustomHttpHandlerTranslator;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.PersistentDao;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,6 +17,7 @@ import java.nio.file.Path;
 
 public class MyKVService implements KVService {
     private final HttpServer server;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyKVService.class);
 
     public MyKVService(int port) throws IOException {
         InetSocketAddress addr = new InetSocketAddress(port);
@@ -28,6 +31,9 @@ public class MyKVService implements KVService {
 
     @Override
     public void start() {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Starting MyUrlShortenerService at {}", server.getAddress());
+        }
         server.start();
     }
 

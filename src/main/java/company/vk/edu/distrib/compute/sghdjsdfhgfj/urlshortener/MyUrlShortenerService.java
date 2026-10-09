@@ -8,21 +8,28 @@ import company.vk.edu.distrib.compute.masha533.urlshortener.PersistentDao;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.CustomHttpHandler;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.CustomHttpHandlerTranslator;
 import company.vk.edu.distrib.compute.sghdjsdfhgfj.StatusCodeException;
-import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.handlers.*;
+import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.handlers.LinksHandler;
+import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.handlers.RedirectHandler;
+import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.handlers.StatusHandler;
+import company.vk.edu.distrib.compute.sghdjsdfhgfj.urlshortener.handlers.UsersHandler;
 import company.vk.edu.distrib.compute.urlshortener.UrlShortenerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Base64;
+import java.util.NoSuchElementException;
 
 public class MyUrlShortenerService implements UrlShortenerService {
     private final HttpServer server;
     private Dao<String> urls;
     private final Dao<String> users;
     private static final int TWO = 2;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyUrlShortenerService.class);
 
     public MyUrlShortenerService(int port) throws IOException {
         InetSocketAddress addr = new InetSocketAddress(port);
@@ -39,6 +46,9 @@ public class MyUrlShortenerService implements UrlShortenerService {
 
     @Override
     public void start() {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Starting MyUrlShortenerService at {}", server.getAddress());
+        }
         server.start();
     }
 
