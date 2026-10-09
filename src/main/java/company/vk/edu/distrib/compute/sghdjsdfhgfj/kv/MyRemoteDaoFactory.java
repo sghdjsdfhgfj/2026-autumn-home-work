@@ -11,7 +11,6 @@ public class MyRemoteDaoFactory implements RemoteDaoFactory<String> {
     @Override
     public Dao<String> create(int... ports) throws IOException {
         int port = ports[0];
-        new MyKVServiceFactory().create(port).start();
         return new MyRemoteDao(port);
     }
 }

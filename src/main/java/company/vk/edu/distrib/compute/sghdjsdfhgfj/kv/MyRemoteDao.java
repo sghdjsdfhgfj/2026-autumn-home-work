@@ -17,7 +17,7 @@ public class MyRemoteDao implements Dao<String> {
 
     @Override
     public String get(String key) throws NoSuchElementException, IllegalArgumentException, IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity/" + key).toURL().openConnection();
+        HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity?id=" + key).toURL().openConnection();
         conn.setRequestMethod("GET");
         conn.setDoOutput(true);
         int status = conn.getResponseCode();
@@ -33,7 +33,7 @@ public class MyRemoteDao implements Dao<String> {
 
     @Override
     public void upsert(String key, String value) throws IllegalArgumentException, IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity/" + key).toURL().openConnection();
+        HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity?id=" + key).toURL().openConnection();
         conn.setRequestMethod("PUT");
         conn.setDoOutput(true);
         conn.getOutputStream().write(value.getBytes());
@@ -47,7 +47,7 @@ public class MyRemoteDao implements Dao<String> {
 
     @Override
     public void delete(String key) throws IllegalArgumentException, IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity/" + key).toURL().openConnection();
+        HttpURLConnection conn = (HttpURLConnection) url.resolve("/v0/entity?id=" + key).toURL().openConnection();
         conn.setRequestMethod("DELETE");
         int status = conn.getResponseCode();
         if (status != StatusCode.ACCEPTED.getCode()) {
