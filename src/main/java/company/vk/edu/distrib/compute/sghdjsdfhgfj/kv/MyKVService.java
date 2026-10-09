@@ -32,13 +32,16 @@ public class MyKVService implements KVService {
     @Override
     public void start() {
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Starting MyUrlShortenerService at {}", server.getAddress());
+            LOGGER.info("Starting MyKVService at {}", server.getAddress());
         }
         server.start();
     }
 
     @Override
     public void stop() {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Stopping MyKVService at {}", server.getAddress());
+        }
         server.stop(0);
     }
 

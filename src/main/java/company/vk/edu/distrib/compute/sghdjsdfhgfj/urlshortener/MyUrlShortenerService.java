@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Executors;
 
 public class MyUrlShortenerService implements UrlShortenerService {
     private final HttpServer server;
@@ -34,6 +35,7 @@ public class MyUrlShortenerService implements UrlShortenerService {
     public MyUrlShortenerService(int port) throws IOException {
         InetSocketAddress addr = new InetSocketAddress(port);
         server = HttpServer.create(addr, 0);
+        server.setExecutor(Executors.newFixedThreadPool(8));
         Path tempDir = Files.createTempDirectory("sghdjsdfhgfj");
         urls = new PersistentDao(tempDir.resolve("urls.dat"));
         users = new PersistentDao(tempDir.resolve("users.dat"));
@@ -54,6 +56,9 @@ public class MyUrlShortenerService implements UrlShortenerService {
 
     @Override
     public void stop() {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Stopping MyUrlShortenerService at {}", server.getAddress());
+        }
         server.stop(0);
     }
 
