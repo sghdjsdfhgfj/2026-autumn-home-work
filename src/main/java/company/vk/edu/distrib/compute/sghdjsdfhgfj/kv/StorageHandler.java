@@ -12,12 +12,12 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Function;
 
 class StorageHandler implements CustomHttpHandler {
     private final int port;
     private final PersistentDao storage;
     private Optional<ShardManager> shardManager;
+    private static final int DEFAULT_ACK = 1;
 
     private static final Logger LOG = LoggerFactory.getLogger(StorageHandler.class);
 
@@ -34,7 +34,7 @@ class StorageHandler implements CustomHttpHandler {
         String id = getId(params);
         int ack = getAck(params);
 
-        if (ack == 1) {
+        if (ack == DEFAULT_ACK) {
             if (storage.containsKey(id)) {
                 byte[] value = storage.get(id);
                 xch.sendResponseHeaders(200, 0);
@@ -67,8 +67,6 @@ class StorageHandler implements CustomHttpHandler {
                         return Optional.of(dao.get(id, 1));
                     } catch (NoSuchElementException e) {
                         return Optional.empty();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
                     }
                 });
         Optional<byte[]> value = results.stream().filter(Optional::isPresent).map(Optional::get).findFirst();
@@ -99,11 +97,7 @@ class StorageHandler implements CustomHttpHandler {
                 storage.upsert(id, value);
                 return true;
             }, (dao) -> {
-                try {
-                    dao.upsert(id, value, 1);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                dao.upsert(id, value, 1);
                 return true;
             });
             xch.sendResponseHeaders(201, 0);
@@ -129,11 +123,7 @@ class StorageHandler implements CustomHttpHandler {
                 storage.delete(id);
                 return true;
             }, (dao) -> {
-                try {
-                    dao.delete(id);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                dao.delete(id);
                 return true;
             });
             xch.sendResponseHeaders(200, 0);
@@ -144,7 +134,7 @@ class StorageHandler implements CustomHttpHandler {
             MyRemoteDao[] daos,
             int ack,
             Callable<T> self,
-            Function<MyRemoteDao, T> other
+            MyRemoteDaoFunction<T> other
     ) throws StatusCodeException {
         int jobCount = daos.length;
 
