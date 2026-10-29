@@ -126,7 +126,7 @@ class StorageHandler implements CustomHttpHandler {
                 dao.delete(id);
                 return true;
             });
-            xch.sendResponseHeaders(200, 0);
+            xch.sendResponseHeaders(202, 0);
         }
     }
 
