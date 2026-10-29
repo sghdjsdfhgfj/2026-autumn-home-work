@@ -85,7 +85,7 @@ class StorageHandler implements CustomHttpHandler {
         int ack = getAck(params);
         byte[] value = xch.getRequestBody().readAllBytes();
 
-        if (ack == 1) {
+        if (ack == DEFAULT_ACK) {
             storage.upsert(id, value);
             xch.sendResponseHeaders(201, 0);
         } else {
@@ -111,7 +111,7 @@ class StorageHandler implements CustomHttpHandler {
         String id = getId(params);
         int ack = getAck(params);
 
-        if (ack == 1) {
+        if (ack == DEFAULT_ACK) {
             storage.delete(id);
             xch.sendResponseHeaders(202, 0);
         } else {
