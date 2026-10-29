@@ -14,6 +14,11 @@ public class StatusCodeException extends Exception {
         this.statusCode = statusCode;
     }
 
+    public StatusCodeException(int statusCode, Throwable cause) {
+        super(cause);
+        this.statusCode = statusCode;
+    }
+
     public int getStatusCode() {
         return statusCode;
     }
@@ -36,5 +41,13 @@ public class StatusCodeException extends Exception {
 
     public static StatusCodeException badRequest() {
         return new StatusCodeException(StatusCode.BAD_REQUEST.getCode());
+    }
+
+    public static StatusCodeException badRequest(Exception e) {
+        return new StatusCodeException(StatusCode.BAD_REQUEST.getCode(), e);
+    }
+
+    public static StatusCodeException serviceUnavailable() {
+        return new StatusCodeException(StatusCode.SERVICE_UNAVAILABLE.getCode());
     }
 }

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.Executors;
 
 public class MyKVService implements KVService {
     private final HttpServer server;
@@ -22,11 +23,12 @@ public class MyKVService implements KVService {
     public MyKVService(int port) throws IOException {
         InetSocketAddress addr = new InetSocketAddress(port);
         server = HttpServer.create(addr, 0);
+        server.setExecutor(Executors.newFixedThreadPool(8));
         Path tempDir = Files.createTempDirectory("sghdjsdfhgfj");
         PersistentDao storage = new PersistentDao(tempDir.resolve(RequestUtils.generateId()));
 
         addContext("/v0/status", new StatusHandler());
-        addContext("/v0/entity", new StorageHandler(storage));
+        addContext("/v0/entity", new StorageHandler(port, storage));
     }
 
     @Override

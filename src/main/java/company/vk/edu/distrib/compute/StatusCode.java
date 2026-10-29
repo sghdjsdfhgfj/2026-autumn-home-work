@@ -8,7 +8,8 @@ public enum StatusCode {
     UNAUTHORIZED(401),
     NOT_FOUND(404),
     METHOD_NOT_ALLOWED(405),
-    UNPROCESSABLE_ENTITY(422);
+    UNPROCESSABLE_ENTITY(422),
+    SERVICE_UNAVAILABLE(503);
 
     private final int code;
 
